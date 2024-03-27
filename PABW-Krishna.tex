@@ -1,0 +1,907 @@
+\documentclass{article}[12pt]
+\usepackage[utf8]{inputenc}
+\usepackage{natbib}
+\bibliographystyle{alpha}
+
+\usepackage{tabularx} % extra features for tabular environment
+\usepackage{amsmath,amsthm, amssymb, amsfonts,latexsym,amscd}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+\usepackage{tikz}
+
+\setlength{\arrayrulewidth}{0.5mm}
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.5}
+
+%\usetikzlibrary{shadings,patterns}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{note}[theorem]{Note}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+%\newenvironment{Construction}[1]{\par\noindent\underline{Construction}\space#1}{}
+\newenvironment{Construction}[1]{\par\noindent\textbf{Construction 1}\space#1}{}
+\newenvironment{claim}[1]{\par\noindent\textit{claim:}\space#1}{}
+%\newenvironment{claimproof}[1]{\par\noindent\textit{proof:}\space#1}{\hfill $\blacksquare$}
+\newenvironment{claimproof}[1]{\par\noindent\textit{proof:}\space#1}{\hfill{}}
+\usepackage[margin=1in,letterpaper]{geometry} % decreases margins
+% \usepackage{mathpazo}
+%\usepackage{libertine}
+%\usepackage{cite} % takes care of citations
+\usepackage[final]{hyperref} % adds hyper links inside the generated pdf file
+\hypersetup{
+	colorlinks=true,       % false: boxed links; true: colored links
+	linkcolor=blue,        % color of internal links
+	citecolor=blue,        % color of links to bibliography
+	filecolor=magenta,     % color of file links
+	urlcolor=blue         
+}
+%++++++++++++++++++++++++++++++++++++++++
+
+\newcommand{\FF}{{\rm I\!F}}
+\newcommand{\CA}{\mathcal{A}}
+\newcommand{\CB}{\mathcal{B}}
+\newcommand{\CE}{\mathcal{E}}
+\newcommand{\wt}{\mathtt{wt}}
+\newcommand{\spt}{\mathtt{sup}}
+\newcommand{\nl}{\mathtt{nl}}
+\newcommand{\ds}{\mathtt{d}}
+\newcommand{\red}{\color{red}}
+\title{A Class of Weightwise Almost Perfectly Balanced Boolean Functions}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+	The construction of Boolean functions with good cryptographic properties over a subset of vectors with fixed Hamming weight $E_{n,k} \subset \FF_2^n$ is significant in lightweight stream ciphers like FLIP~\cite{MJSC16}. In this article, we have given a construction for a class of $n$-variable weightwise almost perfectly balanced (WAPB) Boolean functions from known support of an $n_0$-variable WAPB where $n_0 < n$. This is a generalization of constructing a weightwise perfectly balanced (WPB) Boolean function by Mesnager and Su~\cite{MS21}. At the end of this article, we have also studied some cryptographic properties like ANF, weight, and nonlinearity of the functions.  The ANF of this function is recursive, which would be a low-cost implementation in a lightweight stream cipher. The nonlinearity of this class of functions is very poor.
+\end{abstract}
+
+\section{Introduction}\label{sec:intr}
+An $n$-variable Boolean function $f$ is a mapping from the $n$-dimensional vector space $\FF_2^n$ to $\FF_2$, where $\FF_2$ is a finite field with two elements $\{0,1\}$. Depending upon underlying algebraic structure, `$+$' symbol is used for the addition operation in both $\FF_2$ and $\mathbb{R}$.
+The Boolean functions are used as a filter function in stream ciphers to generate a pseudo-random sequence. Some cryptographic criteria have been defined to analyze and construct Boolean functions for use in the ciphers to resist different attacks. Generally, the cryptographic criteria of a filter function are defined over the entire domain of vector space $\FF_2^n$. The study of the Boolean functions over a restricted domain became interesting after the appearance of the stream cipher FLIP in 2016~\cite{MJSC16}. The main idea of proposing the cipher FLIP is to combine the symmetric cipher with homomorphic encryption to achieve an admissible scheme for delegated computations through cloud services. In this new stream cipher design, the inputs are permuted by a bit permutation generator before entering the filter function in each updating processing. Therefore, the whole setup is known as a filter permutator. So, the Hamming weight (i.e., the number of non-zero coordinates) of the inputs to the filter function remains the same as the Hamming weight of the secret key. This restriction of the inputs significantly changes the viewpoint toward the security analysis of it. Cryptanalysis of the initial version of FLIP and some modifications in the filter function are presented in~\cite{DLR16}. However, the motivation to construct Boolean functions in the FLIP frame of reference arises. An initial cryptographic study of Boolean function in a restricted domain is introduced by Carlet et al. in~\cite{CMR17}. The mathematical introduction of the required parameters (i.e., balancedness, nonlinearity, and algebraic immunity) of a Boolean function in a restricted domain of $\FF_2^n$ are presented in the paper. 
+
+Unlike the FLIP cipher, no prior relations are defined, in general, over the inputs of the Boolean function in the stream cipher. The Boolean functions used as filter functions in stream cipher are distributed uniformly over $\FF_2^n$ and are called balanced Boolean functions. In this new model, the Hamming weight of the key register is known (i.e., $\frac{n}{2}$ for $n$ even). Therefore, the keystream should look like a random sequence over the restricted domain (i.e., the set of vectors of the constant Hamming weight).
+{\red So it is preferred to use a filter function by allowing a small bias in the keystream to hide the Hamming weight of the inputs over the set of vectors with constant weight.}
+Therefore, the filter functions balanced over the subsets of $\FF_2^n$ containing vectors with constant Hamming weight are said to be weightwise perfectly balanced (WPB). The functions with good cryptographic criteria over the restricted domains are essential in the FLIP frame of reference. Some critical cryptographic criteria of a Boolean function over a restricted domain are studied in~\cite{CMR17}. An upper bound on the nonlinearity of a Boolean function on restricted inputs is presented in~\cite{CMR17}. The nonlinearity bound is further improved in~\cite{MZD19}. {\red In~\cite{MMMRS20}}
+
+The first weightwise perfectly balanced (WPB) Boolean function construction was introduced in~\cite{CMR17} in 2017. The construction is based on the direct sum of two WPB Boolean functions of $2^{n}$- variable by modifying one of the WPB functions. A generalized result is presented by using four Boolean functions. The author also presented a recursive construction for weightwise almost perfectly balanced (WAPB) Boolean functions in the same paper. In~\cite{LM19}, Jian Liu and Sihem Mesnager have presented a construction for a class of WPB Boolean functions of $2^{n}$-variables. A subclass of their constructed WPB Boolean functions satisfies high weightwise nonlinearity. In 2020, Jingjing Li and Sihong Su in~\cite{LS20} provided a construction for a class of WAPB Boolean function of $2^{q+2}$-variable for $q \geq 1$ and then constructed a WPB of variable $2^{q+2}$ by modifying the support of the WAPB Boolean function. Several constructions of WPB and WAPB Boolean functions are presented in~\cite{MS21} by modifying the support of linear and quadratic functions. Recently in 2022, some constructions for WAPB Boolean functions are presented in~\cite{ZS22, GS22}.
+\subsection{Our Contributions}\label{ssec:cont}
+In this paper, we have given a construction for a class of WAPB Boolean functions on any arbitrary number of variables $n$. We also have discussed the nonlinearity of the constructed WAPB over $\FF_2^n$. Then we try to improve the nonlinearity of the WAPB by changing the Boolean function that we use as initialized function in this recursive construction.
+\subsection{Organisation}\label{ssec:org}
+The research objectives and our contributions are already outlined. The remaining part of the paper is organized as follows.
+\begin{itemize}
+	\item In section 2, we define the Boolean function and present some basic properties to analyze the function over $\FF_2^n$. Further, we define WAPB and WPB Boolean functions to study the cryptographic properties of these functions over a subset of $\FF_2^n$. We present some previous constructions of WAPB and WPB functions which are necessary for our prime motivation .
+	\item We describe a construction of a class of WAPB functions from a known WAPB function in section 3. We further generalize the WPB Boolean function introduced in \cite{MS21} for all $n$. The ANF of the introduced WAPB has been discussed in section 3.1. The nonlinearity, algebraic immunity over $\FF_2^n$ as well as over restricted domain are also analyzed in section 3.2 and 3.3 respectively.
+	\item We improvise our construction to a greater extent to improve the nonlinearity over $E \subset \FF_2^n$ in section 4. The  nonlinearity over $\FF_2^n$ of the modified construction has been illustrated. We also provide a comparison of our constructions with  known constructions.      
+	    
+\end{itemize}
+ 
+
+\section{Preliminary}\label{sec:prel}
+Let $\CB_n$ be the set of all $n$-variable Boolean functions. Let denote $[i,j] = \{i, i+1, \ldots, j\}$ for two integers $i,j$ with $i \leq j$.
+For any $v = (v_1, v_2, \ldots, v_n) \in \FF_2^n$, the Hamming weight of $v$ is defined as $\wt(v) = |\{i \in [1,n] : v_i = 1\}$. 
+The support of a Boolean function $f \in \CB_n$ is $\spt(f)= \{v \in \FF_2^n : f(v) = 1\}$ and Hamming weight of $f$ is $\wt(f) = |\spt(f)|$.
+Let $\CE_n$ be the family of subsets $E_{n,k} = \{v \in \FF_2^n : \wt(v) = k\}$ for $k \in [0,n]$ of $\FF_2^n$. 
+The support and Hamming weight of $f$ restricted to $E_{n,k}$ are denoted as $\spt_k(f_n)= \{v \in E_{n,k} : f(v) = 1\}$ and $\wt_k(f) = |\spt_k(f_n)|$ respectively.
+The Hamming distance between two functions $f, g \in \CB_n$ is given as $\ds(f,g)= |\{v \in \FF_2^n : f(v) \neq g(v)\}| = \wt(f+g)$.
+
+A basic representation of Boolean function (known as the truth table representation) is the $2^n$-tuple vector representation i.e., $f= \{f(0,0, \ldots, 0), f(0,0,\ldots,1), \ldots, f(1,1,\ldots,1)\}$. Another representation is algebraic normal form (ANF), which is a multi-variable polynomial over $\FF_2$. The ANF of $f \in \CB_n$ is defined as $f(x)= \sum_{u \in \FF_2^n}a_ux^u$, where $a_u \in \FF_2$ and $x^u=x_1^{u_1}x_2^{u_2} \cdots x_n^{u_n}$ for $x=(x_1,x_2, \ldots,x_n)$. The algebraic degree of the Boolean function $f \in \CB_n$ is defined as $\deg(f)=\max\{\wt(u) : u \in \FF_2^n, a_u \neq 0\}$. Any $f \in \CB_n$, with $ \deg(f) \leq 1$ is said to be an affine Boolean function and the set of all affine Boolean functions in $\CB_n$ is denoted by $\CA_n$.
+
+A Boolean function $f \in \CB_n$ is balanced, if $\wt(f)=2^{n-1}$. The Boolean function that is used for cryptographic algorithm should be balanced to look like a random sequence when the inputs goes through all the elements of $\FF_2^n$. The nonlinearity of $f \in \CB_n$, denoted as $\nl(f)$ is the Hamming distance of $f$ from the set of all affine functions. That is, $\nl(f)= \min_{g \in \CA_n} \ds(f,g)$.
+Similarly, all these cryptographic criteria are also defined for the $n$-variable Boolean function, when the inputs are restricted to $E_{n,k}$. 
+
+\begin{definition}~\cite{CMR17}
+A Boolean function $f \in \CB_n$ is said to be weightwise perfectly balanced (WPB) if the restriction of $f$ to $E_{n,k}$ , is balanced for all $k \in [1,n-1]$ i.e., ${n\choose k}$ is even and $\wt_k(f) = \frac{{n\choose k}}{2}$.
+\end{definition}
+
+\begin{definition}~\cite{CMR17}
+A Boolean function $f \in \CB_n$ is said to be weightwise almost perfectly balanced (WAPB), if for all $k \in [0,n]$, 
+\begin{equation*}
+    \wt_k(f)=
+    \begin{cases}
+     \frac{{n\choose k}}{2}, & \textit{if } {n \choose k} \textit{ is even},\\
+     \frac{{n \choose k}\pm 1}{2}, & \textit{if } {n \choose k} \textit{ is \; odd}.
+    \end{cases}
+\end{equation*}
+\end{definition}
+
+Let $x = (x_1, x_2,\ldots, x_n), y = (y_1, y_2, \ldots, y_n) \in \FF_2^n$, then $y$ covers $x$ (i.e., $ x \preceq y $), if $x_{i} \leq y_{i} \forall i \in [n]$. A remarkable theorem~\cite{L78} was presented by \'Erdouard Lucas in 1878  that provides a simple way to evaluate the binomial coefficient ${n \choose k}$ modulo a prime $p$. The same has been used to compute ${n \choose k}$ is odd or even.
+
+\begin{proposition}[Lucas Theorem] \label{Lucas}
+Let the binary representation of $n$ and $k$ be $(n_1,n_2,\ldots,n_l)$ and $(k_1,k_2,\ldots,k_l)$ respectively, where $n_i, k_i \in \{0,1\}$ for $i \in [l]$, then
+	$${n \choose k} = 
+	    \begin{cases}
+		     1 (\textit{mod} \; 2)  & \textit{if} \;  k \preceq n \\
+		     0 (\textit{mod} \; 2)  & \textit{if} \;  k \npreceq n.
+	    \end{cases}$$
+\end{proposition}
+Hence, it is straightforward from Theorem~\ref{Lucas} that $n \choose k$ is even for all $k \in [1,n-1]$ iff $n = 2^m$ for a nonnegative integer $m$. Then we have the following corollaries on the existence of the WPB functions.
+\begin{corollary}~\cite{CMR17}\label{cor:WPBS}
+If $f \in B_n$ is a WPB Boolean function then $n=2^{m}$ for a nonnegative integer $m$.
+\end{corollary}
+\begin{corollary}\label{cor:WPBN}
+If $n = 2^m$ for a nonnegative integer $m$ then there are 
+$\displaystyle {4\prod_{k = 1}^{n-1} {{{n \choose k}} \choose {{n \choose k}/2}}}$ WPB Boolean functions on $n$ variable.
+\end{corollary}
+A WPB Boolean function $f \in \CB_n$ is balanced, if $f(0,0, \ldots, 0) \neq f(1, 1, \ldots, 1)$. Hence, there are $\displaystyle {2\prod_{k = 1}^{n-1} {{{n \choose k}} \choose {{n \choose k}/2}}}$ balanced WPB Boolean functions.
+Such kind of Boolean functions with good cryptographic criteria over $E_{n,k}$ are significant for the stream cipher FLIP. The nonlinearity of a Boolean function over a restricted domain is introduced in~\cite{CMR17}. 
+\begin{definition}~\label{def:nl}
+The nonlinearity of $f \in \CB_n$ over $E_{n,k}$, denoted as $\nl_k(f)$, is the Hamming distance of $f$ to the set of all affine functions $\CA_n$ when evaluated over $E_{n,k}$. That is, $\nl_k(f) = \min_{g \in \CA_n} d_k(f,g) = \min_{g \in \CA_n} \wt_k(f+g)$.
+\end{definition}
+The following identity and upper bound on nonlinearity of a Boolean function over $E_{n,k}$ can be derived. The upper bound is further improved by Mesnager et al in ~\cite{MZD19}.
+\begin{lemma}~\cite{CMR17}\label{lem:nl}
+If $f \in B_n$ then
+$$ \nl_k(f) = \frac{|E_{n,k}|}{2}- \frac{1}{2}\max_{a \in \FF_2^n} | \sum_{x \in E_{n,k}} (-1)^{f(x) + a.x}| \textit{ and } $$
+$$\nl_k(f) \leq \frac{1}{2} [|E_{n,k}| - \sqrt{|E_{n,k}|}]$$
+for $k \in [0,n]$ (where $|E_{n,k}|= {n \choose k}$).
+\end{lemma}
+
+For crypographic use, specially in lightweight ciphers, the Boolean functions need to have good cryptographic properties along with simple algebraic normal form for fast computation, inexpensive implementation and energy efficiency.
+The first construction for the class of WPB and WAPB Boolean functions have been introduced by Carlet et al. in~\cite{CMR17} using the direct sum of Boolean functions. Let $f \in \CB_n$ and $g \in\CB_m$, then The direct sum of $f \in \CB_n, g \in \CB_m$ forms a Boolean function $h \in\CB_{n+m}$ such that $h(x,y)= f(x) + g(y) , \textit{ where  } x \in \FF_2^n , y \in \FF_2^m.$ The following propositions present some of the constructions of WPB and WAPB Boolean functions available in the literature.
+\begin{proposition}~\cite{CMR17}\label{cons:CMR1}
+Let $f, f', g, g' \in \CB_n$ where $f, f', g$ are WPB functions. Then the function $h \in \CB_{2n}$ is defined by $\displaystyle{h(x,y)= f(x) + \prod_{i=1}^n x_i + g(y) + (f(x) + f'(x)) g'(y)}$,  where $x,y \in \FF_2^n$, is a WPB Boolean function.
+\end{proposition}
+
+\begin{proposition}~\cite{CMR17}\label{cons:CMR2}
+    Let $f_n \in \CB_n$ for $n \geq 3$, be defined by 
+    \begin{equation*}
+        f_n(x_1,x_2,\ldots,x_n)= 
+        \begin{cases}
+            f_{n-1}(x_1,x_2,\ldots,x_{n-1}) & \textit{ if } n \textit{ is \; odd },\\
+            \displaystyle{f_{n-1}(x_1,x_2,\ldots,x_{n-1})+ x_{n-2} + \prod_{i=1}^{2^{d-1}}x_{n-i}} & \textit{ if } n=2^{d}; d >1 , \\
+            \displaystyle{f_{n-1}(x_1,x_2,\ldots,x_{n-1})+ x_{n-2} + \prod_{i=1}^{2^{d}}x_{n-i}} & \textit{ if } n= p.2^{d}; p >1 \textit{ odd}; d \geq 1. 
+        \end{cases}
+    \end{equation*}
+    where $f_2(x_1,x_2)=x_1$, is a WAPB Boolean function.
+\end{proposition}
+
+\begin{proposition}~\cite{MS21}\label{cons:MS}
+For a positive integer $n = 2^m$, the support of $f_n\in\CB_n$ is defined by
+\begin{eqnarray*}
+\spt(f_n) & = & \triangle_{i=1}^m \{(x,y,x,y,\ldots ,x,y) \in \FF_2^{n} : x,y \in \FF_2^{2^{m-i}}, \wt(x) \textit{ is odd} \}. \\
+         & = & \begin{cases}
+         \{(1,y) : y \in \FF_2\} & \textit{ if } n = 2, \\
+         \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\}
+         \triangle \{(x,x) : x \in \spt(f_{\frac{n}{2}})\} & \textit{ if } n > 2.
+         \end{cases}
+\end{eqnarray*}
+Then the Boolean function $f_n$ is WPB.
+\end{proposition}
+\begin{corollary}~\cite{MS21}\label{cor:MS}
+The ANF of the Boolean function $f_n$ proposed in Proposition~\ref{cons:MS} is 
+$$f_n(x_1, x_2, \ldots, x_n) = \begin{cases}
+x_1 & \textit{ if } n = 2, \\
+\displaystyle{\sum_{i=1}^{\frac{n}{2}} x_i + f_{\frac{n}{2}}(x_1, x_2, \ldots, x_{\frac{n}{2}}) + \prod_{i=1}^{\frac{n}{2}}(x_i + x_{\frac{n}{2}+i}+1)} & \textit{ if } n > 2.
+\end{cases}$$
+\end{corollary}
+The construction proposed in Proposition~\ref{cons:MS} is important for our study as we will provide a construction which generalizes it. The following WAPB construction presented in~\cite{ZS22} is based on the direct sum of WPB Boolean functions of $n_{i}$s variables where $n_{i}$s are distinct powers of 2. 
+
+\begin{proposition}~\cite{ZS22}\label{cons:ZS}
+Let $n = n_1 + n_2 + \cdots + n_p$ for $n_i$ being the power of $2$ for $1 \leq i \leq p$ and $0< n_1 < n_2 < \cdots < n_{p}$. Let $f_{n_{i}} \in\CB_{n_{i}}$ be WPB with $f_{n_{i}}(0, 0, \ldots, 0) = 0 , f_{n_{i}}(1,1, \ldots,1) = 1$ for $1 \leq i \leq p$ .  Then $h \in \CB_n$ defined as 
+ \begin{equation*}
+ h_n(x_1,x_2, \ldots, x_n) = f_{n_1}(x_1,x_2,\ldots, x_{n_1}) + f_{n_2}(x_{n_1+1},x_{n_1+2}, \ldots, x_{n_1+n_2} ) +
+ \cdots + f_{n_{p}}(x_{n-n_{p}+1}, x_{n-n_{p}+2}, \ldots, x_n)
+ \end{equation*}
+ is WAPB.
+ \end{proposition}
+
+%For a combinatorial construction, we have used the following formula which was coined after the French mathematician Alexandre-Th\'eophile Vandermonde  in 1772.  
+The following combinatorial identities are useful for our study and construction. The book~\cite{G72} contains a list of very useful combinatorial identities and inequalities.
+\begin{lemma}\label{lem:combid}~\cite[Item3.10]{G72} For the positive integers $m, k$, we have
+$$\displaystyle{\sum_{i=0}^{\lfloor\frac{k-1}{2}\rfloor} {m \choose 2i+1 } {m \choose k-(2i+1)} = \frac{1}{2} {2m \choose k} + \frac{(-1)^\frac{k}{2}}{2}{m \choose \frac{k}{2}}\frac{1+(-1)^k}{2}}.$$
+\begin{enumerate}
+    \item\label{itm:combido} If $k$ is odd, that implies  $\displaystyle{\sum_{\substack{j=0 \\ j \text{ is odd}}}^k {m \choose j} {m \choose k-j} = \frac{1}{2} {2m \choose k}}$.
+    \item\label{itm:combide} If $k$ is even, that implies  $\displaystyle{\sum_{\substack{j=0 \\ j \text{ is odd}}}^k {m \choose j} {m \choose k-j} = \frac{1}{2} {2m \choose k} - (-1)^\frac{k}{2}{m \choose \frac{k}{2}}}$.
+    \begin{enumerate}
+    \item \label{itm:combideo} If $\frac{k}{2}$ is odd, that implies  $\displaystyle{\sum_{\substack{j=0 \\ j \text{ is odd}}}^k {m \choose j} {m \choose k-j} = \frac{1}{2} {2m \choose k} + {m \choose \frac{k}{2}}}$.
+    \item \label{itm:combidee} If $\frac{k}{2}$ is even, that implies  $\displaystyle{\sum_{\substack{j=0 \\ j \text{ is odd}}}^k {m \choose j} {m \choose k-j} = \frac{1}{2} {2m \choose k} - {m \choose \frac{k}{2}}}$.
+    \end{enumerate}
+\end{enumerate}
+\end{lemma}
+
+%\begin{lemma}\label{lem:combid} For the positive integers $n, m, k$, we have
+%\begin{enumerate}
+%\item ~\cite[Item3.1]{G72} : $\displaystyle{\sum_{i=0}^k {n \choose i} {m \choose k-i} = {n+m \choose k}}$ (Vandermonde Convolution).
+%\item ~\cite[Item3.10]{G72}\label{itm:combid2} : $\displaystyle{\sum_{i=0}^{\lfloor\frac{k-1}{2}\rfloor} {m \choose 2i+1 } {m \choose k-(2i+1)} = \frac{1}{2} {2m \choose k} + \frac{(-1)^\frac{k}{2}}{2}{m \choose \frac{k}{2}}\frac{1+(-1)^k}{2}}$.
+%\begin{enumerate}
+%    \item If $k$ is odd, that implies  $\displaystyle{\sum_{\substack{j=0 \\ j \text{ is odd}}}^k {m \choose j} {m \choose k-j} = \frac{1}{2} {2m \choose k}}$.
+%    \item If $k$ is even, that implies  $\displaystyle{\sum_{\substack{j=0 \\ j \text{ is odd}}}^k {m \choose j} {m \choose k-j} = \frac{1}{2} {2m \choose k} - (-1)^\frac{k}{2}{m \choose \frac{k}{2}}}$.
+%\end{enumerate}
+
+%\item ~\cite[Item3.9]{G72} : $\displaystyle{\sum_{i=0}^k {n \choose 2i } {n \choose 2k-2i} = \frac{1}{2} { 2n \choose 2k} + \frac{(-1)^k}{2}{n \choose k}}$.
+%\item ~\cite[Item3.7]{G72} : $\displaystyle{\sum_{i=0}^{k-1} { n \choose i}{ n \choose 2k-1-i} = \frac{1}{2} {2n \choose 2k-1}}$ where $0 \leq 2k-1 \leq 2n$.
+%\end{enumerate}
+%\end{lemma}
+\section{Few classes of WAPB Boolean functions}~\label{sec:WABP}
+%In framework of FLIP, it is necessary to construct a class of Boolean functions of variables $n$ that have optimized cryptographic criteria over $E_{n,k}$. In literature, there are several constructions using combinatorial identities to construct WPB and WAPB Boolean functions. 
+In this section, we provide several constructions for $n$-variable of WAPB Boolean functions. In the paper~\cite{MS21}, Mesnager and Su have proposed a WPB Boolean function over $n = 2^m$ variables using an iterative method (see~\ref{cons:MS} to build its support. We have generalized idea to construction WAPB functions on any variable $n$ in Theorem~\ref{thm:WAPB1} and Theorem~\ref{thm:WAPB2}. The following results are needed to prove the Theorems.
+
+\begin{lemma}\label{lem:covers}
+	Let $n$ be an odd integer. For $k \in [0,n]$, 
+	\begin{enumerate}
+		\item if $k \npreceq n$, then $k \npreceq n-1$ and $k-1 \npreceq n-1$.
+		\item if $k \preceq n$ and  
+		\begin{enumerate}
+		    \item $k$ is odd, then $k \npreceq n-1$ and $k-1 \preceq n-1$;
+		    \item $k$ is even, then $k \preceq n-1$ and $ k-1 \npreceq n-1$.
+		\end{enumerate}
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+Let the binary expansion of $n$ and $k$ be $n = \sum_{i=0}^l n_i 2^i$ and $k = \sum_{i=0}^l k_i 2^i$ where  $n_i, k_i \in \{0,1\}$ for $i \in [0,l]$.
+Further consider the binary expansion of $n-1$ and $k-1$ be $n-1 = \sum_{i=0}^l n_i' 2^i$ and $k = \sum_{i=0}^l k_i' 2^i$ where  $n_i', k_i' \in \{0,1\}$ for $i \in [0,l]$.
+As $n$ is odd, $n_0 = 1$, $n_0' = 0$ and $n_i = n_i'$ for $i \in [1,l]$
+	\begin{enumerate}	
+		\item  As $k \npreceq n$, $k_s > n_s$  for some $s \in [1,l]$.
+		As $n_s' = n_s$, $k_s > n_s'$. So, $k \npreceq n-1$.
+		
+		If $k$ is odd then in the binary expansion of $k-1$, $k_0' = 0$, $k_0 = 1$, and $k_i' = k_i$ for $i \in [1,l]$. Here, it still $k_s' > n_s'$ and that implies $k-1 \npreceq n-1$.
+		If $k$ is even, then $k-1$ is odd. In this case, $k_0' = 1$ and $n_0' = 0$. So, $k-1 \npreceq n-1$. 
+		
+		\item As $k \preceq n$, $k_i \leq n_i$, $\forall i \in [0, l]$. If $k$ is odd, $k-1$ is even. Then $k_0' = 0$ and $n_0' = 0$ and other bits satisfies $k_i' \leq n_i'$, $\forall i \in [1, l]$. Hence, $k-1 \preceq n-1$. As $k$ is odd, $n_0' < k_0$. So, $k \npreceq n-1$.
+		
+		Similarly, if $k$ is even, $k_0 = n_0' = 0$ and $k_{i} \leq n_i' = n_i \forall i\in [1,l]$. That implies, $k \preceq n-1$. Further, since $n_0' = 0$ and $k_0' = 1$, $k-1 \npreceq n-1$.
+	\end{enumerate}
+\end{proof}
+
+\begin{lemma}\label{lem:WAPB1}
+Let $n > 1 $ be an odd integer and $g, h \in \CB_{n-1}$ be two WAPB Boolean functions. Then $f \in \CB_n$ defined as 
+$$f(x_1, x_2, \ldots, x_n) = (1+x_n) g(x_1, x_2, \ldots, x_{n-1}) +  x_n h(x_1, x_2,  \ldots, x_{n-1})$$
+$$\textit{i.e., } \spt(f) = \{(x,0) \in \FF_2^n : x \in \spt(g)\} \cup
+	\{(y,1) \in \FF_2^n : y \in \spt(h)\}$$
+is a WAPB Boolean function.
+\end{lemma}
+\begin{proof}
+ Since $g, h \in \CB_{n-1}$ are WAPB Boolean functions, $\displaystyle{\wt_k(g)= \frac{{n-1 \choose k} + b_k^{n-1}}{2}}$ and $\displaystyle{\wt_k(h)= \frac{{n-1 \choose k} + c_k^{n-1}}{2}}$for $k \in [0,n-1]$ where
+    $$b_k^{n-1} =
+		\begin{cases}
+		0 ,   & if \;  k \npreceq n-1, \\
+		\pm 1,	& if \;  k \preceq n-1
+		\end{cases} \; \; \; \; \textit{ and } \; \; \; \;
+		c_k^{n-1} =
+		\begin{cases}
+		0 ,   & if \;  k \npreceq n-1, \\
+		\pm 1,	& if \;  k \preceq n-1.
+		\end{cases}$$
+	As $f$ is defined, we have
+	$$\wt_0(f) = \wt_0(g) = \frac{{n-1 \choose 0} + b_0^{n-1}}{2} = \frac{{n \choose 0} + b_0^{n-1}}{2}$$
+	and $$\wt_n(f) = \wt_{n-1}(h) = \frac{{n-1 \choose n-1} + c_{n-1}^{n-1}}{2} = \frac{{n \choose n} + c_{n-1}^{n-1}}{2}.$$
+	Further, for $k \in [1,n-1]$, we have
+	$$\spt_k(f) = \{(x,0) : x \in \spt_k(g)\} \cup \{(y,1) : y \in \spt_{k-1}(h)\}.$$
+That implies, 
+\begin{align*}
+\wt_k(f) & = \wt_k(g) + \wt_{k-1}(h) \\
+    	& = \frac{1}{2}\left[ {{n-1} \choose {k-1}} + b_k^{n-1} \right] + \frac{1}{2}\left[ {{n-1} \choose {k-1}}+ c_{k-1}^{n-1} \right] \\
+    	& = \frac{1}{2} \left[ {{n} \choose k } + a_k^{n}\right]  ;  \hspace{1.0cm} \textit{where} \; a_k^{n}= b_k^{n-1} + c_{k-1}^{n-1}.
+\end{align*}
+\begin{itemize}
+    \item If $k \npreceq n$, then using Lemma~\ref{lem:covers}, $k \npreceq n-1$ and $k-1 \npreceq n-1$. Then $b_k^{n-1} = c_{k-1}^{n-1} = 0$. Hence, $a_k^{n} = 0$ i.e., $\wt_k(f)= \frac{1}{2}{n \choose k}$.
+    \item If $k \preceq n$, then from Lemma~\ref{lem:covers}, 
+    \begin{itemize}
+    \item if $k$ is odd, then $k \npreceq n-1$ and $k-1 \preceq n-1$. Then $b_k^{n-1}=0$ and $c_{k-1}^{n-1} \neq 0$. Hence $a_k^n= c_{k-1}^{n-1}$ i.e., $\wt_k(f)= \frac{1}{2}\left({n \choose k} + c_{k-1}^{n-1}\right)$.
+     \item if $k$ is even, then $k \preceq n-1$ and $k-1 \npreceq n-1$. Then $b_k^{n-1} \neq 0$ and $c_{k-1}^{n-1} = 0$. Then, $a_k^{n}= b_k^{n-1}$ i.e., $\wt_k(f) = \frac{1}{2} \left({n \choose k} + b_k^{n-1}\right)$. 
+    \end{itemize}	
+\end{itemize}
+Hence, $f \in \CB_n$ is a WAPB Boolean function with $\displaystyle{\wt_k(f)= \frac{{n \choose k} + a_k^{n-1}}{2}}$ where
+$$a_k^n =
+\begin{cases}
+		0 ,   & \textit{ if }  k \npreceq n, \\
+		b_k^{n-1},	& \textit{ if }  k \preceq n \textit{ and even}, \\
+		c_{k-1}^{n-1},	& \textit{ if }  k \preceq n \textit{ and odd}, \\
+		c_{n-1}^{n-1}, & \textit{ if }  k = n.
+\end{cases}$$
+\end{proof}
+The following is a construction of a $2^m+1$-variable WAPB Boolean function from two $2^m$-variable WPB Boolean functions.  
+\begin{corollary}\label{cor:WAPB1}
+Let $n = 2^m \geq 2$ and $g, h \in \CB_n$ be two WPB Boolean functions. Then $f \in \CB_{n+1}$ such that $$f(x_1, x_2, \ldots, x_{n+1}) = (1+x_{n+1}) g(x_1, x_2, \ldots, x_n) +  x_{n+1} h(x_1, x_2,  \ldots, x_n)$$
+is a WAPB Boolean function.
+\end{corollary}
+If $g = h$ then Lemma~\ref{lem:WAPB1} is a case of the construction proposed in Proposition~\ref{cons:ZS} for $n = 2^m+1$. Further, if we take $h = 1+g$ in the Lemma~\ref{lem:WAPB1} then the following corollary is useful for our main construction.
+\begin{corollary}\label{cor:WAPB_odd}
+Let $n > 1$ be an odd integer and $f_{n-1} \in \CB_{n-1}$ is a WAPB Boolean function.
+Then $f_n \in \CB_n$ defined as
+\begin{eqnarray*}
+f_n(x_1,x_2, \ldots, x_n) & = & (1+x_n) f_{n-1}(x_1, x_2, \ldots, x_{n-1}) +  x_n (1 + f_{n-1}(x_1, x_2,  \ldots, x_{n-1})) \\
+ & = & x_n + f_{n-1}(x_1, x_2, \ldots, x_{n-1})\end{eqnarray*}
+$$\textit{i.e., } \spt(f_n) = \{(x,0) \in \FF_2^n : x \in \spt(f_{n-1})\} \cup
+	\{(x,1) \in \FF_2^n : x \notin \spt(f_{n-1})\}$$
+ is a WAPB Boolean function.
+\end{corollary}
+If we denote $\wt_k(f_n)= \frac{{n \choose k} + a_k^n}{2}$ and $\wt_k(f_{n-1})= \frac{{n-1 \choose k} + a_k^{n-1}}{2}$, then
+$$a_k^n =
+\begin{cases}
+		0 ,   & \textit{ if }  k \npreceq n, \\
+		a_k^{n-1},	& \textit{ if }  k \preceq n \textit{ and even}, \\
+		-a_{k-1}^{n-1},	& \textit{ if }  k \preceq n \textit{ and odd}, \\
+		-a_{n-1}^{n-1}, & \textit{ if }  k = n.
+\end{cases}$$
+\begin{lemma}\label{lem:WAPB_even}
+Let $n = n_02^m$ where $n_0$ be an odd positive integer and $m \geq 0$ be an integer. Let $f_{n_0} \in \CB_{n_0}$ be a WAPB Boolean function. Then $f_n \in \CB_n$, recursively defined as 
+	$$\spt(f_n)=
+	\begin{cases} 
+	\spt(f_{n_0}) & \textit{ if } n = n_0 \textit{ is odd }, \\
+	\{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}, & \textit{ if } n \textit{ is even},
+	\end{cases}$$
+	is a WAPB Boolean function.
+\end{lemma}
+\begin{proof}
+The proof follows the idea to the proof of~\cite[Theorem 3]{MS21}. As $f_{n_0}$ is a WAPB Bollean function, $\displaystyle{\wt_k(f_{n_0})= \frac{{n_0 \choose k} + a_k^{n_0}}{2}}$ such that $a_k^{n_0} \in \{0, \pm 1\}$ for $k \in [0,n_0]$. Let $k \in [0,n]$ be factored as $k = k_02^{b}$ where $k_0$ is odd and $b \geq 0$ is an integer. Hence, for $k \in [0,n]$, we will prove that $\displaystyle{\wt_k(f_n) = \frac{{n \choose k} + a_k^n}{2}}$ where $a_k^n = \begin{cases}
+  0  & \textit{ if }  k \npreceq n, \\                                                                                                                                                                                                                                                                                                                                                               
+  \pm 1  & \textit{ if }  k \preceq n.                                                                                                                                                                                                                                                                                                                                                               \end{cases}$
+We will prove it in two different cases i.e, (1) $m > b$ and (2) $m \leq b$.
+
+%$$\wt(f_n)_k = \sum_{\substack{j = 0 \\ j \textit{ is odd}}}^k {\frac{n}{2} \choose j}{\frac{n}{2} \choose k-j} = \frac{1}{2}{n \choose k}.$$
+
+%If $k$ is even, then there exist a positive integer $b$ such that $k = k_02^{b}$ where $k_0$ is odd. 
+If $m > b$ (in this case $kc$), then
+\begin{eqnarray*}
+\spt_k(f_n) & = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k \} \triangle \{(z,z) : z \in \spt_\frac{k}{2}(f_{\frac{n}{2}})\}\\
+& = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \\ & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \\ 
+& & \triangle \{(z,z,z,z) : z \in \spt_\frac{k}{2^2}(f_{\frac{n}{2^2}})\} \\
+& = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \\ & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \\ 
+& & \vdots \\
+& &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^b}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{b-1}}\} \\
+& & \triangle \{(z,z,\ldots, z,z) : z \in \spt_\frac{k}{2^b}(f_{\frac{n}{2^b}})\} \\
+& = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \hspace{2.05in} (S_1) \\ 
+& &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\}\hspace{1.62in}(S_2)\\ 
+& & \vdots \\
+& &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^b}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{b-1}}\} \hspace{0.9in}(S_b)\\
+& & \triangle \{(x,y,x,y\ldots, x,y) : x,y \in \FF_2^{\frac{n}{2^{b+1}}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^b}\}\hspace{1.0in}(S_{b+1})
+\end{eqnarray*}
+Here, we stop at $S_{b+1}$ as $\frac{k}{2^{b+1}}$ is not an integer. As $\wt(x)$ is odd in the set $S_1$ and $\wt(x,y) = \frac{k}{2}$ is even in the set $S_2$ in the above identity, the sets $S_1$ and $S_2$ are disjoint. Similarly, we can check that the set $S_3$ is pairwise disjoint with the sets $S_1$ and $S_2$. Continuing the argument, we have that the set $S_j, j \in [2,b]$ is pairwise disjoint with $S_1, S_2, \ldots, S_{j-1}$ i.e., the sets $S_j, j \in [1,b]$ are mutually disjoint. 
+Further, since the $\wt(x,y) = \frac{k}{2^b} = k_0$ is odd in the set $S_{b+1}$, the set $S_{b+1} \subset S_b$. Therefore, 
+$$\wt_k(f_n) = |S_1| + |S_2| + \cdots + |S_b| - |S_{b+1}|.$$
+Here, we can check that 
+\begin{eqnarray*}
+|S_j| & = & \displaystyle{|\{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^j}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{j-1}}\}|} \\
+    & = & \displaystyle{\sum_{\substack{i = 0 \\ i \text{ is odd}}}^\frac{k}{2^{j-1}}{\frac{n}{2^j} \choose i}{\frac{n}{2^j} \choose \frac{k}{2^{j-1}}-i}} \\
+    & = & \begin{cases}
+            \displaystyle{\frac{1}{2}{\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - \frac{1}{2}{\frac{n}{2^j} \choose \frac{k}{2^j}}} & \textit{if } j \in [1,b-1]   \hspace{1.15in} \textit{(using Lemma~\ref{lem:combid}[Item~\ref{itm:combidee}])},\\ & \\
+            \displaystyle{\frac{1}{2}{\frac{n}{2^{b-1}} \choose \frac{k}{2^{b-1}}} + \frac{1}{2}{\frac{n}{2^b} \choose \frac{k}{2^b}}} & \textit{if } j = b,\hspace{1.55in} \textit{(using Lemma~\ref{lem:combid}[Item~\ref{itm:combideo}])},\\ & \\
+            \displaystyle{\frac{1}{2}{\frac{n}{2^b} \choose \frac{k}{2^b}}} & \textit{if } j = b+1 \hspace{1.35in} \textit{(using Lemma~\ref{lem:combid}[Item~\ref{itm:combido}])}.
+    \end{cases}
+\end{eqnarray*}
+Therefore,
+$$\displaystyle{\wt_k(f_n) = \frac{1}{2}\left[\sum_{j = 1}^{b-1} \left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - {\frac{n}{2^j} \choose \frac{k}{2^j}}\right) + {\frac{n}{2^{b-1}} \choose \frac{k}{2^{b-1}}} + {\frac{n}{2^b} \choose \frac{k}{2^b}} - {\frac{n}{2^b} \choose \frac{k}{2^b}}\right] = \frac{1}{2}{n \choose k}}.$$
+If $m \leq b$, then using similar process as the above case we have
+\begin{eqnarray*}
+\spt_k(f_n) & = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \\ & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \\ 
+& & \vdots \\
+& &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^m}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{m-1}}\} \\
+& & \triangle \{(z,z,\ldots, z,z) : z \in \spt_\frac{k}{2^m}(f_{\frac{n}{2^m}})\} \\
+& = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} 
+ \hspace{1.8in}(T_1) \\ 
+& &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\}\hspace{1.35in}(T_2)\\ 
+& & \vdots \\
+& &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^m}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{m-1}}\} \hspace{0.55in}(T_m)\\
+& & \triangle \{(z,z,\ldots, z,z) : z \in \spt_\frac{k}{2^m}(f_{n_0})\} \hspace{2.45in}(T_{m+1})
+\end{eqnarray*}
+It can be checked (as the earlier way) that the sets $T_1, T_2, \ldots, T_m$ are pairwise disjoint.
+If $\frac{k}{2^m}$ is even (i.e., $b > m$), then $\wt(z)$ is even in $T_{m+1}$. So, $T_{m+1}$
+ is too disjoint with $T_i, i \in [1,m]$. Hence, 
+ $$\wt_k(f_n) = |T_1| + |T_2| + \cdots + |T_m| + |T_{m+1}|.$$
+ Here, \begin{eqnarray*}
+|T_j| & = & \begin{cases}
+            \displaystyle{\frac{1}{2}\left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - {\frac{n}{2^j} \choose \frac{k}{2^j}}\right)} & \textit{if } j \in [1,m]   \hspace{.55in} \textit{(using Lemma~\ref{lem:combid}[Item~\ref{itm:combidee}])},\\ & \\
+           \displaystyle{\frac{1}{2}\left({\frac{n}{2^m} \choose \frac{k}{2^m}} + a_\frac{k}{2^m}^{n_0}\right)} & \textit{if } j = m+1 \hspace{.5in} \textit{(as $f_{n_0}$ is WAPB with } \wt_l(f_{n_0}) = \frac{1}{2}\left({n_0 \choose k}+a_l^{n_0}\right)).
+    \end{cases}
+\end{eqnarray*}
+Hence $$\displaystyle{\wt_k(f_n) = \frac{1}{2} \sum_{j=1}^m\left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - \frac{1}{2}{\frac{n}{2^j} \choose \frac{k}{2^j}}\right) + \frac{1}{2}\left({\frac{n}{2^m} \choose \frac{k}{2^m}} + a_\frac{k}{2^m}^{n_0}\right) = \frac{1}{2}\left({n \choose k} + a_\frac{k}{2^m}^{n_0}\right) }.$$
+
+Further, if $\frac{k}{2^m}$ is odd (i.e., $b = m$), then $\wt(z)$ is odd in $T_{m+1}$.
+As $\frac{k}{2^{m-1}}$ is even, $\wt(x)$ and $\wt(y)$ are also odd in the set $T_m$.
+Hence, $T_{m+1} \subset T_m$. That implies,
+$$\wt_k(f_n) = |T_1| + |T_2| + \cdots + |T_m| - |T_{m+1}|.$$
+Here, 
+\begin{eqnarray*}
+|T_j| & = & \begin{cases}
+            \displaystyle{\frac{1}{2}{\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - \frac{1}{2}{\frac{n}{2^j} \choose \frac{k}{2^j}}} & \textit{if } j \in [1,m-1]    \hspace{.35in} \textit{(using Lemma~\ref{lem:combid}[Item~\ref{itm:combidee}])},\\ & \\
+            \displaystyle{\frac{1}{2}{\frac{n}{2^{m-1}} \choose \frac{k}{2^{m-1}}} + \frac{1}{2}{\frac{n}{2^m} \choose \frac{k}{2^m}}} & \textit{if } j  = m   \hspace{.75in} \textit{(using Lemma~\ref{lem:combid}[Item~\ref{itm:combideo}])},\\ & \\
+           \displaystyle{\frac{1}{2}\left({\frac{n}{2^m} \choose \frac{k}{2^m}} + a_\frac{k}{2^m}^{n_0}\right)} & \textit{if } j = m+1 \hspace{.5in} (\textit{as $f_{n_0}$ is WAPB with }\wt_l(f_{n_0}) = \frac{1}{2}\left({n_0 \choose k}+a_l^{n_0}\right)).
+    \end{cases}
+    \end{eqnarray*}
+    Hence $$\displaystyle{\wt_k(f_n) = \frac{1}{2} \sum_{j=1}^{m-1}\left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - \frac{1}{2}{\frac{n}{2^j} \choose \frac{k}{2^j}}\right) + \frac{1}{2}\left(
+    {\frac{n}{2^{m-1}} \choose \frac{k}{2^{m-1}}} + {\frac{n}{2^m} \choose \frac{k}{2^m}}\right) - \frac{1}{2}\left({\frac{n}{2^m} \choose \frac{k}{2^m}} + a_\frac{k}{2^m}^{n_0}\right) = \frac{1}{2}\left({n \choose k} - a_\frac{k}{2^m}^{n_0}\right) }.$$
+    Therefore, for $n = n_02^m$ and $k = k_02^b$, we got that $\wt_k(f_n) = \frac{1}{2}\left({n \choose k} + a_k^n\right)$, where
+    $$a_k^n = 
+    \begin{cases}
+        0 & \textit{ if } m > b, \\
+        a_\frac{k}{2^m}^{n_0} & \textit{ if } m < b, \\
+        - a_\frac{k}{2^m}^{n_0} & \textit{ if } m = b.
+    \end{cases}$$
+    Hence, it is proved that $f_n$ is a WAPB Boolean function if $f_{n_0}$ is a WAPB Boolean function.
+ \end{proof}
+Now we can present general constructions for WAPB Boolean functions on any number of variables using the  Corollary~\ref{cor:WAPB_odd} and Lemma~\ref{lem:WAPB_even}.
+\begin{theorem}\label{thm:WAPB1}
+    For $n \geq 2$, the support of an $n$ variable Boolean function is defined as 
+	\begin{equation}\label{eq:cons1}
+	\spt(f_n)=
+	\begin{cases} 
+	\{(x,1)\in \FF_2^2 : x \in \FF_2\} = \{(0,1),(1,1)\} & \textit{ if } n = 2, \\
+	\{(x,0) \in \FF_2^n : x \in \spt(f_{n-1})\} \cup
+	\{(x,1) \in \FF_2^n : x \notin \spt(f_{n-1})\} & \textit{ if } n > 2 \textit{ and odd},\\ 
+	\{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}, & \textit{ if } n > 2 \textit{ and even},
+	\end{cases}
+	\end{equation}	
+ is a WAPB Boolean function.
+\end{theorem}
+When $n = 2^m$, is a power of $2$, we get the WPB function presented in~\cite{MS21}. The base Boolean function used in the above recursive construction (i.e., $f_2$) is a linear function. As a result the nonlinearity of destined Boolean function remains weak.
+The construction in the Theorem~\ref{thm:WAPB1} can be generalized for having good cryptographic properties from a base WAPB Boolean function on a higher variable.
+\begin{theorem}\label{thm:WAPB2}
+    For $p \geq 2$, let $f_p$ be a WAPB Boolean function.
+    Let $n$ be a positive integer such that, for a $m \geq 0$,
+    \begin{itemize}
+     \item \begin{equation}\label{eqn:T1}
+            p  = \lfloor\frac{n}{2^m}\rfloor \text{ i.e, } n = a_02^0 + a_12^1 + \cdots + a_{m-1}2^{m-1} + p2^m
+           \end{equation}
+     \item [] or,
+     \item \begin{equation} \label{eqn:T2}
+     p + 1 = \lfloor\frac{n}{2^m}\rfloor \text{ i.e, } n = a_02^0 + a_12^1 + \cdots + a_{m-1}2^{m-1} + (p+1)2^m \text{ if $p$ is even}.
+           \end{equation}
+
+    \end{itemize}
+ Then $f_n \in \CB_n$ whose support is defined as 
+	\begin{equation}\label{eq:cons2}
+	\spt(f_n)=
+	\begin{cases} 
+	\spt(f_p) & \textit{ if } n = p, \\
+	\{(x,0) \in \FF_2^n : x \in \spt(f_{n-1})\} \cup
+	\{(x,1) \in \FF_2^n : x \notin \spt(f_{n-1})\} & \textit{ if } n > p \textit{ and odd},\\ 
+	\{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}, & \textit{ if } n > p \textit{ and even},
+	\end{cases}
+	\end{equation}	
+ is a WAPB Boolean function.
+ \end{theorem}
+ For illustration, if we have a WAPB Boolean function on $5$ variables then we can construct a WAPB Boolean function on $10,11,20,21,22,23,40,41, \ldots$ variables. Similarly, if we have a WAPB Boolean on $6$ variables then we can construct a WAPB Boolean function on $7, 12,13,14,15,24,25,26,27, \ldots$ variables.
+ 
+\begin{note}\label{nt:WAPB}
+The construction in the Theorem~\ref{thm:WAPB2} can further be generalized. When $n$ is odd, instead of using two WAPB Boolean functions $f_{n-1}$ and $1+f_{n-1}$, one can use any two WAPB Boolean functions $g, h \in \CB_{n-1}$ (following the Lemma~\ref{lem:WAPB1}) to have $f_n$ in the recursive construction presented in the Equation ~\ref{eq:cons2}.
+\end{note}
+\subsection{Algebraic Normal Form}\label{ssec:anf}
+Since there are two different kind of lifting during the recursive construction (i.e., when $n$ is odd and when $n$ is even), the ANF of the Boolean function $f_n \in \CB_n$ depends on the binary bits of the integer $n$. Therefore the ANF of $f_n$ can be computed as the following theorem.
+\begin{theorem}\label{thm:ANF}
+    For $p \geq 2$, let $f_p$ be a WAPB Boolean function.
+    Let $n$ be a positive integer such that, for a $m \geq 0$,
+    \begin{itemize}
+     \item $p = \lfloor\frac{n}{2^m}\rfloor$ i.e, $n = a_02^0 + a_12^1 + \cdots + a_{m-1}2^{m-1} + p2^m$,
+     \item [] or,
+     \item $p + 1 = \lfloor\frac{n}{2^m}\rfloor$ i.e, $n = a_02^0 + a_12^1 + \cdots + a_{m-1}2^{m-1} + (p+1)2^m$ if $p$ is even.
+    \end{itemize}
+ Then the ANF of $f_n$, defined in the Theorem~\ref{thm:WAPB2} is 
+	\begin{equation}\label{eq:anf}
+	f_n(x_1, x_2, \ldots, x_n) =
+	\begin{cases} 
+	f_p & \textit{ if } n = p, \\
+	x_n + f_{n-1}(x_1, x_2, \ldots, x_{n-1}) & \textit{ if } n > p \textit{ and odd},\\ 
+   \displaystyle{\sum_{i=1}^{\frac{n}{2}} x_{i} + f_{\frac{n}{2}}(x_1,x_2,\ldots,x_\frac{n}{2})\prod_{i=1}^{\frac{n}{2}} (x_i + x_{\frac{n}{2} + i} + 1) }      & \textit{ if } n > p \textit{ and even},
+   \end{cases}
+   \end{equation}	
+ is a WAPB Boolean function.
+ \end{theorem}
+ \begin{proof}
+If $n = p$, then by our assumption $f_n = f_p$. Now consider that $n > p$. If $n$ is odd then the ANF of $f_n$ is done from the Corollary~\ref{cor:WAPB_odd}.
+Now if $n$ is even, we prove it following the technique of the proof from~\cite[Theorem 4]{MS21}. Here 
+\begin{align*}
+\spt(f_n) & = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}
+\end{align*}
+Let denote $g_n, h_n \in \CB_n$ such that
+$$ \spt(g_n) = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\}; \text{ and }
+\spt(h_n) = \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}.$$
+Then the ANFs of $g_n$ and $h_n$ are
+$$g_n(x_1,x_2, \ldots, x_n) = \sum_{i=1}^{\frac{n}{2}} x_i \text{ and } h(x_1,x_2, \ldots, x_n) = f_{\frac{n}{2}}(x_1,x_2, \ldots, x_{\frac{n}{2}}) \prod_{i=1}^{\frac{n}{2}}(x_i+x_{\frac{n}{2}+i}+1).$$
+As the XOR operation imitates the symmetric difference of the supports of two Boolean functions, we have 
+\begin{align*}
+f_n(x_1,x_2,\ldots,x_n)=  \displaystyle{\sum_{i=1}^{\frac{n}{2}} x_{i} + f_{\frac{n}{2}}(x_1,x_2,\ldots,x_\frac{n}{2})\prod_{i=1}^{\frac{n}{2}} (x_i + x_{\frac{n}{2} + i} + 1) }.
+\end{align*}
+\end{proof}
+For example, we will compute ANF of $f_{11} \in \CB_{11}$ for a given WAPB $f_5 \in \CB_5$.  Then we will have $f_{10}(x_1,x_2, \ldots, x_{10}) = \displaystyle{\sum_{i=1}^5 x_{i} + f_5(x_1,x_2,\ldots,x_5)\prod_{i=1}^5 (x_i + x_{5 + i} + 1) }$. Then we will have $f_{11}(x_1,x_2, \ldots, x_{11}) = \displaystyle{\sum_{i=1}^5 x_{i} +x_{11} + f_5(x_1,x_2,\ldots,x_5)\prod_{i=1}^5 (x_i + x_{5 + i} + 1)}$. Therefore, the ANF of the WAPB functions are complex and can be computed recursively very fast.
+
+The algebraic degree of $f_n$ can be computed as follows.
+\begin{theorem}\label{thm:deg}
+Let $f_p \in \CB_p$ be a Boolean function with $\deg(f_p) \geq 1$ and $f_n \in \CB_n$ be the Boolean function constructed as in the Theorem~\ref{thm:WAPB2}. Then the algebraic degree of $f_n$ is $\deg(f_n) = \lfloor\frac{n}{2}\rfloor + \lfloor\frac{n}{2^2}\rfloor + \cdots + \lfloor\frac{n}{2^m}\rfloor + \deg(f_{p})$. That is,
+\begin{enumerate}
+ \item  $\deg(f_n) = n - (p+a_{m-1}+a_{m-2}+\cdots+a_0)+\deg(f_p)$ if $p = \lfloor\frac{n}{2^m}\rfloor$ as in the Equation~\ref{eqn:T1};
+ \item $\deg(f_n) = n - (p+1+a_{m-1}+a_{m-2}+\cdots+a_0)+\deg(f_p)$ if $p+1 = \lfloor\frac{n}{2^m}\rfloor$ as in the Equation~\ref{eqn:T2}.
+\end{enumerate}
+
+
+%$\deg(f_n) = p(2^m-1)+\deg(f_p)$.
+\end{theorem}
+\begin{proof}
+%Consider the case $n = p2^m + a_{m-1}2^{m-1} + \cdots + a_12 + a_0$.
+If $a_0 = 1$ (i.e., $n$ is odd) then $f_n(x_1, x_2, \ldots,x_n) = x_n + f_{n-1}(x_1, x_2, \ldots,x_{n-1})$. Hence, $\deg(f_n) = \deg(f_{n-a_0})$ irrespective of $a_0 = 0$ or $1$.\\
+Further, if $n$ is even (i.e., $a_0 = 0$) then
+$f(x_1, x_2, \ldots,x_n) = \displaystyle{\sum_{i=1}^{\frac{n}{2}} x_{i} + f_{\frac{n}{2}}(x_1,x_2,\ldots,x_\frac{n}{2})\prod_{i=1}^{\frac{n}{2}} (x_i + x_{\frac{n}{2} + i} + 1)}$ as per the construction. That implies $\deg(f_n) = \frac{n}{2} + \deg(f_\frac{n}{2})$.
+Therefore, doing this process recursively, we will have
+\begin{eqnarray*}
+\deg(f_n) & = & \deg(f_{n-a_0}) = \frac{n-a_0}{2} + 
+\deg(f_\frac{n-a_0}{2}) = \lfloor\frac{n}{2}\rfloor + 
+\deg(f_{\lfloor\frac{n}{2}\rfloor})\\
+& = & \lfloor\frac{n}{2}\rfloor + \deg(f_{\lfloor\frac{n}{2}\rfloor-a_1})
+= \lfloor\frac{n}{2}\rfloor + \frac{\lfloor\frac{n}{2}\rfloor-a_1}{2} + \deg(f_{\frac{\lfloor\frac{n}{2}\rfloor-a_1}{2}}) = \lfloor\frac{n}{2}\rfloor + \lfloor\frac{n}{2^2}\rfloor + \deg(f_{\lfloor\frac{n}{2^2}\rfloor})\\
+& & \vdots \\
+& = & \lfloor\frac{n}{2}\rfloor + \lfloor\frac{n}{2^2}\rfloor + \cdots + \lfloor\frac{n}{2^m}\rfloor + \deg(f_{\lfloor\frac{n}{2^m}\rfloor})\\
+& = & \lfloor\frac{n}{2}\rfloor + \lfloor\frac{n}{2^2}\rfloor + \cdots + \lfloor\frac{n}{2^m}\rfloor + \deg(f_{p}) \hspace{.5in}\text{(if $p$ is even, still $\deg(f_{p+1}) = \deg(f_p)$)}.
+\end{eqnarray*}
+If $p = \lfloor\frac{n}{2^m}\rfloor$ (as the Equation~\ref{eqn:T1}), $\lfloor\frac{n}{2^k}\rfloor = p2^{m-k} + a_{m-1}2^{m-1-k} + \cdots + a_k$ for $0 \leq k \leq m$.
+Then, substituting $\lfloor\frac{n}{2^k}\rfloor$ for $1 \leq k \leq m$ in the above equation we will have
+$\deg(f_n) = n - (p+a_{m-1}+a_{m-2}+\cdots+a_0)+\deg(f_p)$.
+Similarly, for the case as in the Equation~\ref{eqn:T2}, we will have $\deg(f_n) = n - (p+1+a_{m-1}+a_{m-2}+\cdots+a_0)+\deg(f_p)$.
+\end{proof}
+The following corollary presents the degree of $f_n$ (constructed as in the Theorem~\ref{thm:WAPB1}) for some speacial $n$.
+\begin{corollary}
+For $n \geq 2$, consider the WAPB Boolean function $f_n \in \CB_n$ as in the Theorem~\ref{thm:WAPB1}. The degree of $f_n$ is
+\begin{enumerate}
+\item $n-1$ if $n = 2^k$ for some $k \geq 1$ (i.e.,  $n$ is a power of $2$)~\cite[Corollary 3]{MS21};
+\item $n-k$ if $n = 2^k-1$ for some $k \geq 2$.
+\end{enumerate}
+\end{corollary}
+\begin{proof}
+ \begin{enumerate}
+\item Here $p = 2$ as per the Theorem~\ref{thm:WAPB1} and $n = 2^k$. That is, $m = k-1$ and $a_{m-1}= \cdots = a_0 = 0$.
+So $\deg(f_n) = n - p+\deg(f_2) = n - 2 + 1 = n-1$.
+\item Here $p = 2$ as per the Theorem~\ref{thm:WAPB1} and $n = 2^k-1 = (2+1)2^{k-2}+2^{k-3}+ \cdots+ 2^1 + 1$. That implies,
+$m = k-2$ and $a_{m-1} = \cdots = a_0 = 1$. So $\deg(f_n) = n - (p+1+(a_{m-1} + \cdots + a_0))+\deg(f_2) = n - (2 + 1 + m)+1= n-2-(k-2) = n-k$.
+ \end{enumerate}
+
+\end{proof}
+
+\subsection{Nonlinearity}\label{ssec:nl}
+Nonlinearity is a very important cryptographic properties of Boolean functions. In this subsection we will study the nonlinearity of our proposed WAPB Boolean functions. Since there are two different kind of lifting in the recursive construction, we will present the nonlinearity bound for the both cases.
+\begin{lemma}\label{lem:nl1}
+Let $f_n \in \CB_n$ such $f_n(x_1, x_2, \cdots,x_n) = x_n + f_{n-1}(x_1, x_2, \cdots,x_{n-1})$ for a $f_{n-1} \in CB_n$.
+Then $\nl(f_n) = 2\nl(f_{n-1})$.
+\end{lemma}
+\begin{proof}
+Let $a_{n-1} \in \CB_{n-1}$ be an affine function such that $\ds(f_{n-1},a_{n-1}) = \nl(f_{n-1})$. Then $\ds(f_n,x_n+a_{n-1}) = 2\nl(f_{n-1})$. That implies $\nl(f_n) \leq 2\nl(f_{n-1})$.
+
+In other direction, let $a_n \in \CB_n$ be an affine function such that $\ds(f_n,l_n) = \nl(f_n)$. Consider that $a_n = (1+x_n)b_{n-1} + x_n c_{n-1}$ where $b_{n-1}, c_{n-1} \in CB_{n-1}$ are two affine functions. Then $\ds(f_{n-1},b_{n-1}) \leq \frac{\nl(f_n)}{2}$ or, $\ds(1+f_{n-1},c_{n-1}) = \ds(f_{n-1},1+c_{n-1}) \leq \frac{\nl(f_n)}{2}$. That implies,
+$\nl(f_{n-1}) \leq \frac{\nl(f_n)}{2}$, i.e., $\nl(f_n) \geq 2\nl(f_{n-1})$. Hence, $\nl(f_n) = 2\nl(f_{n-1})$.
+\end{proof}
+
+\begin{lemma}\label{lem:nl2}
+Let $n > 0$ be an even integer and $f_n \in \CB_n$ such that
+$$\spt(f_n) = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\} \textit{ where } f_{\frac{n}{2}} \in \CB_{\frac{n}{2}}.$$
+Then $\nl(f_n) \leq \wt(f_{\frac{n}{2}})$.
+\end{lemma}
+\begin{proof}
+Consider $g,h \in \CB_n$ such that $\spt(g) = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\}$ and $\spt(h) = \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}$. Then $f_n = g + h$ and $g = x_1 + x_2 + \cdots + x_{\frac{n}{2}}$ is a linear function. Therefore, $\ds(f_n,g) = \wt(h) = |\{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}| = \wt(f_{\frac{n}{2}})$. That implies, $\nl(f_n) \leq \wt(f_{\frac{n}{2}})$.
+\end{proof}
+If $f_{\frac{n}{2}}$ is a balance function, then $\nl(f_n) \leq \wt(f_{\frac{n}{2}}) = 2^{\frac{n}{2}-1}$. This lifting is very discouraging in terms of nonlinearity. Therefore, the proposed 
+construction is having very poor nonlinearity. This result happens due to the addition of the linear part $\{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\}$. The researchers may be interested whether it is possible to get WAPB function by substituting the linear part a very nonlinear part. Further, we have a discouraging result for wightwise nonlinearity.
+\begin{corollary}\label{cor:nlodd}
+If $n$ is even and $n > p$ then $\nl_k(f_n) = 0$ for all odd integer $k \in [0,n]$. 
+\end{corollary}
+\begin{proof}
+ Consider the functions $g,h$ as in the proof of the Lemma~\ref{lem:nl2}. Then $\spt_k(h) = \phi$ for every odd $k \in [0,n]$. Therefore, $f_n = g$ which is a linear function and hence $\nl_k(f_n) = 0$ for all odd $k \in [0,n]$.
+\end{proof}
+The following table presents the nonlinearity and weight nonlinearity of the functions for $n = 10, 11, 12, 13, 14$ which are generated using the Theorem~\ref{thm:WAPB1}.
+$$\begin{array}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} \hline
+n & \nl & \nl_0 & \nl_1 & \nl_2 & \nl_3 & \nl_4 & \nl_5 & \nl_6 & \nl_7 & \nl_8 & \nl_9 & \nl_{10} & \nl_{11} & \nl_{12} & \nl_{13} & \nl_{14} \\ \hline
+10 & 16 = 2^4 & 0 & 0 & 3 & 0 & 5 & 0 & 5 & 0 & 3 & 0 & 0 & - & - & - & - \\ \hline
+11 & 32 & 0 & 0 & 3 & 3 & 5 & 5 & 5 & 5 & 3 & 3 & 0 & 0 & - & - & - \\ \hline
+12 & 32 = 2^5 & 0 & 0 & 3 & 0 & 7 & 0 & 10 & 0 & 8 & 0 & 3 & 0 & 0 & - & - \\ \hline
+13 & 64 & 0 & 0 & 3 & 3 & 7 & 7 & 10 & 10 & 8 & 8 & 3 & 3 & 0 & 0 & - \\ \hline
+14 & 64 = 2^6 & 0 & 0 & 4 & 0 & 10 & 0 & 18 & 0 & 18 & 0 & 10 & 0 & 4 & 0 & 0 \\ \hline
+\end{array}$$
+
+
+ 
+ Similarly, we have a construction of a $2^m$-variable WPB Boolean function from two $2^m-1$ WAPB Boolean functions. 
+
+\begin{theorem} \label{thm:WPB1}
+	Let $n=2^m \geq 2$ and $g,g' \in\CB_{n-1}$ be two WAPB with Hamming weight 
+	$\wt_k(g) = \wt_k(g') = \frac{{n-1 \choose k}+ (-1)^{k}}{2}$ for $k \in [0,n-1]$. Then $f \in \CB_n$ such that $$f(x_1,x_2,\ldots,x_n) = (1+x_n) g(x_1,x_2,\ldots,x_{n-1})+x_n g'(x_1,x_2,\dots,x_{n-1})$$ is a WPB Boolean function.
+\end{theorem}
+
+\begin{proof}
+Here, $f(x_1,x_2,\ldots,x_n) =
+	\begin{cases}
+	g(x_1,x_2,\ldots, x_{n-1}) & \textit{for \;}  x_n=0, \\
+	g'(x_1,x_2,\ldots, x_{n-1}) & \textit{for \;}  x_n=1.
+	\end{cases}$
+	For $k \in [1,n]$,  $x \in E_{n,k}$ is of the form $x = x'||0$ for $x' \in E_{n-1,k}$ or $x = x'||1$ for $x' \in E_{n-1,k-1}$.
+	Hence, for $x \in E_{n,k}$, $f(x) = g(x')$ if $x = x'||0$ with $x' \in E_{n-1,k}$ or, $f(x) = g'(x')$ if $x = x'||1$ with $x' \in E_{n-1,k-1}$.
+	So, $\wt_k(f) = \wt_k(g) + \wt_{k-1}(g')$ for $k \in [1,n]$.
+	For $k \in [1,n-1]$, 
+	$\wt_k(f) = \wt_k(g)+ \wt_{k-1}(g') = \frac{{n-1 \choose k} + (-1)^{k}}{2} + \frac{{n-1 \choose k-1} + (-1)^{k-1}}{2} = \frac{{n \choose k}}{2}$.
+	Hence, $f$ is WPB Boolean function on $n = 2^m$ variables.
+\end{proof}
+
+
+\section{Algebraic Immunity}
+Let $E \subseteq \FF_2^n$ and $f,g$ be two $n$-variable Boolean functions defined over $E$. Then, $g$ is said to be an annihilator of $f$ over $E$,if $g(x)f(x)=0$ holds. If $E=\FF_2^n$, then $g$ is said to be an annihilator of $f$ over $\FF_2^n$ if $g(x)f(x)=0$ forall $x \in \FF_2^n$.
+
+So, the algebraic immunity of a Boolean function $f$ over $\FF_2^{n}$ is defined as
+\begin{align*}
+	AI(f)= min\{deg(g) : f(x).g(x)= 0 \text{ or }  (f(x)+1).g(x) = 0 ; g(x)\neq 0 \text{ over } \FF_2^n \}
+\end{align*}
+So,it can be concluded that, the annihilator $g(x)$ of $f(x)$ over $\FF_2^n$ is also an annihilator $f(x)$, when $f$ is restricted $E$. Hence, $AI_E (f) \leq AI(f)$.
+\begin{definition}
+	Let $E \subseteq \FF_2^n$. The algebraic immunity of a function $f$ over E, denoted by $AI_E (f) = min \{deg(g) : f(x).g(x)= 0 \text{ or }  (f(x)+1).g(x) = 0; g(x) \neq 0 \text{ over } E \}$. 
+\end{definition}
+
+\begin{proposition} 
+	Let $E \subseteq \FF_2^n$ and  $f(x)= x_n f_1(x) +(1+x_n)f_2(x)$, a Boolean function of $n$-variable where $f_1 (x), f_2 (x)$ be Boolean functions of $n-1$-variable. Then there exists $n-1$-variable Boolean function $g_1$ and $g_2$, an annihilator of $f_1$ and $f_2$ respectively, such that $g(x)= x_n g_1(x) + (1+x_n) g_2 (x) $ is an annihilator of $f(x)$. 
+\end{proposition}
+
+\begin{theorem}
+Let $n> 0$ be an even integer and $f_n \in  \CB_n$ such that
+$$\spt(f_n) = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\} \textit{ where } f_{\frac{n}{2}} \in \CB_{\frac{n}{2}}.$$
+
+Then $AI(f) \leq 2$.
+\end{theorem}
+\begin{proof}
+	In Theorem \ref{thm:ANF}, the ANF of the above defined $f_n$ is given by 
+    \begin{align*}
+    		\displaystyle{f_n(x)= \sum_{i=1}^{\frac{n}{2}} x_{i} + f_{\frac{n}{2}}(x_1,x_2,\ldots,x_\frac{n}{2})\prod_{i=1}^{\frac{n}{2}} (x_i + x_{\frac{n}{2} + i} + 1) } 
+    \end{align*}	
+Let $g(x)= (1+ \sum_{i=1}^{\frac{n}{2}} x_{i}) (1+ x_1 + x_{\frac{n}{2}+1} + 1)$. Then, $f_n(x).g(x)= 0 $ for all $x \in \sup(f_n)$. Hence, $AI(f_n) \leq 2$.
+	
+\end{proof}
+
+The algebraic immunity of the Boolean function in Theorem \ref{thm:ANF} over $\FF_2^n$ is poor. \\
+
+\begin{Construction}
+	Let $n = n_02^m$ where $n_0$ be an odd positive integer and $m \geq 1$ be an integer. Let $f_{n_0} \in \CB_{n_0}$ be a WAPB Boolean function. The $f_n \in \CB_n$, recursively defined in Lemma \ref{lem:WAPB_even} as
+	$$\spt(f_n)=
+	\begin{cases} 
+	\spt(f_{n_0}) & \textit{ if } n = n_0 \textit{ is odd }, \\
+	\{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}\} \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}, & \textit{ if } n \textit{ is even},
+	\end{cases}$$
+	For $k \in [0,n]$, the $\spt(f_n)$ over $E_{n,k}$ is
+	\begin{align*}
+		\spt_k(f_n) = \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k \} \triangle \{(z,z) : z \in \spt_\frac{k}{2}(f_{\frac{n}{2}})\}
+	\end{align*}
+	 We define a support $\spt_k(\bar{f_n})$ by modifying $\spt_k(f_n)$ as follows
+	\begin{equation}
+		\spt_k(\bar{f_n})=
+		\begin{cases}
+		    \spt_k(f_n) & \textit{ if } k \textit{ is even }, \\
+		    \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k, \textit{ and for } y= (y_1,y_2,\ldots,y_\frac{n}{2}), y_1 = 1 \} \\ \cup   \{(y,x) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k, \textit{ and for } y= (y_1,y_2,\ldots,y_\frac{n}{2}), y_1 = 0\} & \textit{ if } k \textit{ is odd }.		        
+		\end{cases}
+	\end{equation}
+\end{Construction}
+
+\begin{theorem}
+	The Boolean function $\bar{f}_n \in \CB_n$ generated by Construction 1 is WAPB.
+\end{theorem}
+\begin{proof}
+	The proof is similar to the Lemma \ref{lem:WAPB_even}. Let for $k \in [0,n],$ $k$ can be written as $k =k_0 2^b$ where $k_0$ is odd and $b \geq 0$ be an integer. We will prove this in three different cases by taking (1) $ b = 0$ , (2) $ m > b \geq 1$ and (3) $m \leq b$. \\
+	Case-1: If $b=0$, then $k = k_0$, which is odd. Therefore $k \npreceq n$ as $n= n_0 2^m$ for $m \geq 1$. Then 
+	\begin{eqnarray*}
+		\spt_k(\bar{f_n}) & = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, y= (y_1= 1, y_2, \ldots, y_{\frac{n}{2}}), \wt(x,y) = k \} \\ 
+	& &	\triangle \{ (y,x) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd }, y= (y_1=0,y_2,\ldots, y_{\frac{n}{2}}), \wt(x,y)=k \} \\
+	& & \triangle \{(z,z) : z \in \spt_{\frac{k}{2}}(\bar{f_{\frac{n}{2}}})\}	
+	\end{eqnarray*}	
+ Since $k$ is odd, the set $ \{(z,z) : z \in \spt_{\frac{k}{2}}(\bar{f_{\frac{n}{2}}})\}	$ is an empty set. Now, by taking $$A = \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, y= (y_1=1,y_2,\ldots,y_\frac{n}{2}),\wt(x,y) = k \},$$ and $$ B =  \{(y,x) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, y= (y_1=0,y_2,\ldots,y_\frac{n}{2}), \wt(x,y) = k\}.$$ 
+ We can see, $A \cap B = \phi$, as for $v_1 \in A$ and $v_2 \in B$, Hamming weight of first $\frac{n}{2}$ tuples in $v_1$ is odd whereas in $v_2$ is even. Therefore
+ 
+ \begin{eqnarray*}
+ 	\wt_k(\bar{f_n})
+ 	&= & \sum_{\substack{i = 0 \\ i \text{ is odd}}}^{k} {\frac{n}{2} \choose i }{ \frac{n}{2}-1 \choose (k-1)-i} + \sum_{\substack{i = 0 \\ i \text{ is odd}}}^{k} {\frac{n}{2} \choose i }{{\frac{n}{2}-1} \choose k-i} \\
+ 	& = & \sum_{\substack{i = 0 \\ i \text{ is odd}}}^{k} {\frac{n}{2} \choose i } {\frac{n}{2} \choose k-i} \\
+ 	& = & \frac{1}{2} { n \choose k}
+ \end{eqnarray*} 
+
+Case-II: If $m >b \geq1$, then $k= k_0 2^b$ which is even. So as we defined 
+\begin{eqnarray*}
+	\spt_{k}(\bar{f_n}) & = & \spt_k(f_n) \\
+	 & = & \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \\ & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \\ 
+	 & & \vdots \\
+	 & &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^b}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{b-1}}\} \\
+	 & & \triangle \{(z,z,\ldots, z,z) : z \in \spt_\frac{k}{2^b}(f_{\frac{n}{2^b}})\} \\
+	 & = & \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \\ & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \\ 
+	 & & \vdots \\
+	 & &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^b}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{b-1}}\} \\
+	 & & \triangle \{(z,z,\ldots, z,z) : z \in \spt_\frac{k}{2^b}(\bar{f}_{\frac{n}{2^b}})\} \\
+	 & = & \{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \hspace{2.1in} (S_1)\\ 
+	 & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \hspace{1.61in} (S_2)\\ 
+	 & & \vdots \\
+	 & &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^b}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{b-1}}\} \hspace{0.92in}(S_b)\\
+	 & &  \triangle \{(x,y) : x,y \in \FF_2^{\frac{n}{2^{b+1}}}, \wt(x) \textit{ is odd}, y= (y_1= 1, y_2, \ldots, y_{\frac{n}{2}}), \wt(x,y) = \frac{k}{2^b} \}  \hspace{0.25in}(S_{b+1(a)}) \\ 
+	 & &	\triangle \{ (y,x) : x,y \in \FF_2^{\frac{n}{2^{b+1}}}, \wt(x) \textit{ is odd }, y= (y_1=0,y_2,\ldots, y_{\frac{n}{2}}), \wt(x,y)= \frac{k}{2^b} \}  \hspace{0.25in}(S_{b+1(b)})  \\
+\end{eqnarray*}
+By following the Lemma \ref{lem:WAPB_even}, we can see $S_i \cap S_j= \phi$ for $1 \leq i < j \leq b$. Further, since the $\wt(x,y)= \frac{k}{2^b}= k_0$ is odd in the sets $S_{b+1(a)}$ and $S_{b+1(b)}$, the set $S_{b+1(a)} \cup S_{b+1(b)} \subset S_b$ ( where $S_{b+1(a)} \cap S_{b+1(b)} = \phi$). Therefore,
+\begin{align*}
+	\wt_{k}(\bar{f}_n) = |S_1|+ |S_2| + \cdots + |S_b|- |S_{b+1(a)} \cup S_{b+1(b)}|
+\end{align*} 
+The cardinality of $S_j$ for $j \in [1,b]$ has been computed in Lemma \ref{lem:WAPB_even}. Now, 
+\begin{align*}
+	|S_{b+1(a)} \cup S_{b+1(b)}| & =  \sum_{\substack{i = 0 \\ i \text{ is odd}}}^{\frac{k}{2^b}} {\frac{n}{2^{b+1}} \choose i}{\frac{n}{2^{b+1}}-1 \choose {\frac{k}{2^b}-1-i}} + \sum_{\substack{i = 0 \\ i \text{ is odd}}}^{\frac{k}{2^b}} {\frac{n}{2^{b+1}} \choose i}{\frac{n}{2^{b+1}}-1 \choose {\frac{k}{2^b}-i}} \\
+	& =  \sum_{\substack{i = 0 \\ i \text{ is odd}}}^{\frac{k}{2^b}} {\frac{n}{2^{b+1}} \choose i}{\frac{n}{2^{b+1}} \choose \frac{k}{2^b}-i }	\\
+	& = \frac{1}{2} { \frac{n}{2^b} \choose \frac{k}{2^b}}
+\end{align*}
+Therefore, 
+$$\displaystyle{\wt_k(f_n) = \frac{1}{2}\left[\sum_{j = 1}^{b-1} \left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - {\frac{n}{2^j} \choose \frac{k}{2^j}}\right) + {\frac{n}{2^{b-1}} \choose \frac{k}{2^{b-1}}} + {\frac{n}{2^b} \choose \frac{k}{2^b}} - {\frac{n}{2^b} \choose \frac{k}{2^b}}\right] = \frac{1}{2}{n \choose k}}.$$
+
+If $m < b$, then by following Lemma \ref{lem:WAPB_even} we have
+\begin{eqnarray*}
+	\spt_k(\bar{f}_n) & = &\{(x,y) : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(x,y) = k\} \hspace{1.65in} (T_1)\\
+	 & &\triangle \{(x,y,x,y) : x,y \in \FF_2^{\frac{n}{2^2}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2}\} \hspace{1.2in}(T_2)\\ 
+	& & \vdots \\
+	& &\triangle \{(x,y,x,y, \ldots,x,y) : x,y \in \FF_2^{\frac{n}{2^m}}, \wt(x) \textit{ is odd},  \wt(x,y) = \frac{k}{2^{m-1}}\}  \\
+	& & \triangle \{(z,z,\ldots, z,z) : z \in \spt_\frac{k}{2^m}(f_{\frac{n}{2^m}})\} \hspace{2.2in}(T_{m+1})
+\end{eqnarray*}
+By following Lemma \ref{lem:WAPB_even}, we can see $T_i \cap T_j = \phi$ for $1 \leq i < j \leq m$.  The set $T_{m+1}$ is equal to the set $T_{m+1}$ in Lemma \ref{lem:WAPB_even} for $m < b$ and the cardinality of $T_{j}$ for $j \in [1,m+1]$ is already computed. \\
+Hence $$\displaystyle{\wt_k(\bar{f}_n) = \frac{1}{2} \sum_{j=1}^m\left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - \frac{1}{2}{\frac{n}{2^j} \choose \frac{k}{2^j}}\right) + \frac{1}{2}\left({\frac{n}{2^m} \choose \frac{k}{2^m}} + a_\frac{k}{2^m}^{n_0}\right) = \frac{1}{2}\left({n \choose k} + a_\frac{k}{2^m}^{n_0}\right) }.$$
+Further, if $m =b$, then $\frac{k}{2^m}= k_0$ is odd. Then the set in $T_{m+1} $ i.e.
+\begin{align*}
+\{(z,z,\ldots,z): z \in \spt_{\frac{k}{2^m}}(f_{\frac{n}{2^m}})\} & = \{(z,z,\ldots,z): z \in \spt_{k_0}(f_{n_0})\}
+\end{align*}
+ where $\spt_{k_0}(f_{n_0})$ is defined. For this case, the cardinality of $T_{j}$ for $j \in [1,m+1]$ is also computed in Lemma \ref{lem:WAPB_even}.
+  Hence, $$\displaystyle{\wt_k(\bar{f}_n) = \frac{1}{2} \sum_{j=1}^{m-1}\left({\frac{n}{2^{j-1}} \choose \frac{k}{2^{j-1}}} - \frac{1}{2}{\frac{n}{2^j} \choose \frac{k}{2^j}}\right) + \frac{1}{2}\left(
+ 	{\frac{n}{2^{m-1}} \choose \frac{k}{2^{m-1}}} + {\frac{n}{2^m} \choose \frac{k}{2^m}}\right) - \frac{1}{2}\left({\frac{n}{2^m} \choose \frac{k}{2^m}} + a_\frac{k}{2^m}^{n_0}\right) = \frac{1}{2}\left({n \choose k} - a_\frac{k}{2^m}^{n_0}\right) }.$$
+ Therefore, for $n = n_02^m$ and $k = k_02^b$, we got that $\wt_k(\bar{f}_n) = \frac{1}{2}\left({n \choose k} + a_k^n\right)$, where
+ $$a_k^n = 
+ \begin{cases}
+ 0 & \textit{ if } m > b, \\
+ a_\frac{k}{2^m}^{n_0} & \textit{ if } m < b, \\
+ - a_\frac{k}{2^m}^{n_0} & \textit{ if } m = b.
+ \end{cases}$$
+ Hence, it is proved that $\bar{f}_n$ is a WAPB Boolean function if $f_{n_0}$ is a WAPB Boolean function.
+ 
+\end{proof}
+
+\begin{theorem}\label{thm:mANF}
+	For $p \geq 2$, let $f_p$ be a WAPB Boolean function.
+	Let $n$ be a positive integer such that, for a $m \geq 0$,
+	\begin{itemize}
+		\item $p = \lfloor\frac{n}{2^m}\rfloor$ i.e, $n = a_02^0 + a_12^1 + \cdots + a_{m-1}2^{m-1} + p2^m$,
+		\item [] or,
+		\item $p + 1 = \lfloor\frac{n}{2^m}\rfloor$ i.e, $n = a_02^0 + a_12^1 + \cdots + a_{m-1}2^{m-1} + (p+1)2^m$ if $p$ is even.
+	\end{itemize}
+	Then the ANF of $f_n$, defined in the Theorem~\ref{thm:WAPB2} is 
+	\begin{equation}\label{eq:manf}
+	\bar{f}_n(x_1, x_2, \ldots, x_n) =
+	\begin{cases} 
+	f_p & \textit{ if } n = p, \\
+	x_n + \bar{f}_{n-1}(x_1, x_2, \ldots, x_{n-1}) & \textit{ if } n > p \textit{ and odd},\\ 
+	\displaystyle{\sum_{i=1}^{\frac{n}{2}} x_i + \sum_{i=1}^{\frac{n}{2}} x_i  \sum_{\frac{n}{2}+2}^{n}x_i +	\bar{f}_{\frac{n}{2}}(x_1,x_2, \ldots, x_{\frac{n}{2}}) \prod_{i=1}^{\frac{n}{2}}(x_i+x_{\frac{n}{2}+i}+1) }      & \textit{ if } n > p \textit{ and even},
+	\end{cases}
+	\end{equation}	
+	is a WAPB Boolean function.
+\end{theorem}
+
+\begin{proof}
+	The proof is similar for $n = p$ and for $n$ is odd when $n > p$ from the Theorem \ref{thm:ANF} . Now if $n$ is even, then 
+	\begin{align*}
+		\spt(\bar{f}_n)& = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(y) \textit{ is odd}\}\\
+		& \triangle \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(y) \textit{ is even}, y=(y_1 = 1, y_2, \ldots,y_{\frac{n}{2}}) \}\\
+		& \triangle \{(y,x)\in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(y) \textit{ is even}, y=(y_1 = 0, y_2, \ldots,y_{\frac{n}{2}}) \} \\
+		& \triangle \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}
+	\end{align*} 
+	Let $g_n$, $h_n$, $a_n, b_n$ $ \in \CB_n$ such that
+	\begin{align*}
+		\spt(g_n)& =\{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(y) \textit{ is odd}\} ; \\
+		\spt(h_n) & = \{(x,y) \in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(y) \textit{ is even}, y=(y_1 = 1, y_2, \ldots,y_{\frac{n}{2}}) \} \\
+		\spt(a_n)& = \{(y,x)\in \FF_2^n : x,y \in \FF_2^{\frac{n}{2}}, \wt(x) \textit{ is odd}, \wt(y) \textit{ is even}, y=(y_1 = 0, y_2, \ldots,y_{\frac{n}{2}}) \} \text{ and } \\
+		\spt(b_n)& = \{(z,z) \in \FF_2^n : z \in \spt(f_{\frac{n}{2}})\}
+	\end{align*}
+If we denote $(x,y)= (x_1,x_2,\ldots,x_\frac{n}{2},x_{\frac{n}{2}+1},x_{\frac{n}{2}+2}, \ldots, x_n)$, then  the ANFs of $g_n, h_n$ are
+	         $$ g_n(x_1,x_2,\ldots,x_n)= (\sum_{i=1}^{\frac{n}{2}} x_i)(\sum_{i=\frac{n}{2}+1}^{n}x_i),$$
+	         and 
+	         $$ h_n(x_1,x_2,\ldots,x_n)= (\sum_{i=1}^{\frac{n}{2}} x_i)(\sum_{\frac{n}{2}+2}^{n}x_i) $$
+Similarly, the ANFs of $a_n$ and $b_n$ are 
+             $$ a_n(x_1,x_2,\ldots,x_n)= (\sum_{i=1}^{\frac{n}{2}} x_i)(1+ \sum_{i=\frac{n}{2}+1}^{\frac{n}{2}}x_i)$$
+             and
+             $$ b_n(x_1,x_2,\ldots,x_n)= f_{\frac{n}{2}}(x_1,x_2, \ldots, x_{\frac{n}{2}}) \prod_{i=1}^{\frac{n}{2}}(x_i+x_{\frac{n}{2}+i}+1)$$
+	         
+Therefore, 
+$$\bar{f}_n(x_1,x_2,\ldots,x_n)=  \sum_{i=1}^{\frac{n}{2}} x_i + \sum_{i=1}^{\frac{n}{2}} x_i  \sum_{\frac{n}{2}+2}^{n}x_i +	\bar{f}_{\frac{n}{2}}(x_1,x_2, \ldots, x_{\frac{n}{2}}) \prod_{i=1}^{\frac{n}{2}}(x_i+x_{\frac{n}{2}+i}+1)$$
+\end{proof}
+
+The $k$-weightwise nonlinearity of the WAPB functions $f_6$, $f_7$ and $f_9$ are given in \ref{table:1}, \ref{table:2} and \ref{table:4} respectively. 
+
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{ | c | c | c | c | c | }
+		\hline
+		\textit{WPB/ WAPB functions} & $\nl$ & $\nl_2$ & $\nl_3$ & $\nl_4$   \\
+		\hline
+		Upper Bound \cite{CMR17} &    &  5  & 7  &  5   \\  
+		Carlet, M\'{e}aux and Rotella \cite{CMR17}& - & 2 & 4 & 2  \\
+		Zhu and Su \cite[$f_n$ equation(8)]{ZS22}& - & 1 & 4 & 1  \\
+		Construction 1 &  &  &  &     \\
+		\hline
+	\end{tabular}
+	\caption{Weightwise nonlinearity $\nl_k$ of 6-variable WAPB constructions.}
+	\label{table:1}
+\end{table}
+
+
+\begin{table} 
+	\centering
+	\begin{tabular}{ | c | c | c | c | c | c | }
+		\hline
+		\textit{WPB/ WAPB functions} & $\nl$ & $\nl_2$ & $\nl_3$ & $\nl_4$ & $\nl_5$  \\
+		\hline
+		Upper Bound \cite{CMR17} &    &  8 & 14  &  14 &  8  \\   
+		Zhu and Su \cite[$f_n$ equation(8)]{ZS22}& - & 1 & 5 & 5 & 1 \\
+		Construction 1 &  &  &  &  &   \\
+		\hline
+	\end{tabular}
+	\caption{Weightwise nonlinearity $\nl_k$ of 7-variable WAPB constructions.}
+	\label{table:2}
+\end{table}
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{ | c | c | c | c | c | c | c | }
+		\hline
+		\textit{WPB/ WAPB functions} & $\nl$ & $\nl_2$ & $\nl_3$ & $\nl_4$ & $\nl_5$ & $\nl_6$ \\
+		\hline
+	    Upper Bound \cite{CMR17} & 120  & 11 & 24  & 30  & 24 & 11 \\ 
+       % \hline
+	    Carlet, M{\'{e}}aux, Rotella \cite{CMR17} & - & 2 & 12 & 19 & 12 & 2 \\
+	   %\hline
+		Li and Su \cite[$g_{2^{q+2}}$ equation(9)]{LS20} & - & 2 & 12 & 19 & - & - \\
+		%\hline
+		Mesnager and Su \cite[$f_m$ equation(13)]{MS21} & - & 2 & 0 & 3 & 0 & 2 \\
+		%\hline
+		Mesnager and Su \cite[$g_m$ equation(22)]{MS21} & - & 2 & 14 & 19 & 14 & 2 \\
+		%\hline
+		Mesnager, Su and Li \cite[$f_m$ equation(2) ]{MSL21} & - & 2 & 8 & 8 & 8 & 2 \\
+		%\hline
+		Mesnager, Su and Li \cite[$f_m$ equation(3) ]{MSL21} & - & 6 & 8 & 26 & 8 & 6 \\
+		%\hline
+		Zhang and Su \cite[$g_m$ equation(11)]{ZSu23}  & - & 2 & 12 & 19 & 12 & 6 \\ 
+		%\hline	
+		Construction 1 &   &  &  &  &   & \\
+		\hline
+	\end{tabular}
+    	\caption{Weightwise nonlinearity $\nl_k$ of 8-variable WPB constructions.}
+    	\label{table:3}
+\end{table}
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{ |c|c|c|c|c|c|c|c|c| }
+	\hline
+	\textit{WPB/ WAPB functions}& n  & $\nl$ & $\nl_2$ & $\nl_3$ & $\nl_4$ & $\nl_5$ & $\nl_6$ & $nl_7$ \\
+	\hline
+	Upper Bound \cite{CMR17} &  &  &  15 & 37  &  57   &  57  & 37 & 15  \\ 
+	\hline
+	\multirow{5}{*}{$f_n$ in equation (\ref{eq:anf})} & 9 & - & - & - & - & - & - & - \\
+	               & 10 & - & - & - & - & - &	- & - \\
+	               & 11 & - & - & - & - & - &  - & -  \\
+	               & 12 & - & - & - & - & - & -  & -  \\
+	               & 13 & - & - & - & - & - & -  & -  \\ 
+	\hline
+	\multirow{5}{*}{$\bar{f}_n$ in equation (\ref{eq:manf})} & 9 & - & - & - & - & - & - & - \\
+	& 10 & - & - & - & - & - &	- & - \\
+	& 11 & - & - & - & - & - &  - & -  \\
+	& 12 & - & - & - & - & - & -  & -  \\
+	& 13 & - & - & - & - & - & -  & -  \\ 
+	\hline
+\end{tabular}
+\caption{Weightwise nonlinearity $\nl_k$ of WAPB construction-1.}
+\label{table:4}
+\end{table}
+
+
+
+\section{Conclusions and Future work}
+We have presented a construction of a class of WAPB Boolean functions in $n$-variable from the support of another WAPB Boolean function in $n_0$-variable, where $n_0 < n$. This construction generalizes a construction of WPB functions presented by Mesnager and Su \cite{MS21}. We further have modified the construction for improving the $k$-weightwise nonlinearity. Moreover, 
+\medskip
+
+\bibliography{References}
+
+
+
+
+
+\end{document}
